@@ -1,0 +1,45 @@
+[tool.poetry]
+name = "cmdbroker"
+version = "0.0.4"
+description = "Broker commands to a server"
+authors = ["Brad Pitcher <bradpitcher@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.10"
+cryptography = "^42.0.8"
+
+[tool.poetry.dev-dependencies]
+vulture = ">=2.6"
+bandit = ">=1.7.7"
+safety = ">=1.8"
+isort = ">=5.3"
+flake8-bugbear = ">=19.8"
+black = ">=24.3.0"
+mkdocs-material = ">=9.1.13"
+mypy = ">=0.730.0"
+ipython = ">=8.10.0"
+pip = ">=23.3"
+pytest = ">=5.0"
+pytest-cov = ">=2.7"
+pytest-mock = ">=1.10"
+pep8-naming = ">=0.8.2"
+wheel = ">=0.38.1"
+
+[tool.poetry.group.dev.dependencies]
+pytest-asyncio = "^0.23.7"
+toml = "^0.10.2"
+
+[tool.poetry.scripts]
+cmdbroker = "cmdbroker.cli:async_run"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 100
+
+[tool.isort]
+profile = "hug"
