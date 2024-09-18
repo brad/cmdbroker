@@ -213,7 +213,7 @@ async def test_handle_valid_process_request(mock_message, server):
 
     await server.handle_request(reader, writer)
 
-    writer.write.assert_called_once_with(b"Hello World\n")
+    writer.write.assert_called_once_with(b"Hello World" + os.linesep.encode())
 
 
 @pytest.mark.asyncio
@@ -250,4 +250,4 @@ async def test_handle_valid_process_request_with_stdin(mock_message, server):
 
     await server.handle_request(reader, writer)
 
-    writer.write.assert_called_once_with(b"Hello World\n")
+    writer.write.assert_called_once_with(b"Hello World" + os.linesep.encode())
