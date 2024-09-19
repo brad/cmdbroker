@@ -2,8 +2,8 @@ Command Broker
 _________________
 
 [![PyPI version](https://badge.fury.io/py/cmdbroker.svg)](http://badge.fury.io/py/cmdbroker)
-[![Test Status](https://github.com/brad/cmdbroker/workflows/Test/badge.svg?branch=develop)](https://github.com/brad/cmdbroker/actions?query=workflow%3ATest)
-[![Lint Status](https://github.com/brad/cmdbroker/workflows/Lint/badge.svg?branch=develop)](https://github.com/brad/cmdbroker/actions?query=workflow%3ALint)
+[![Test Status](https://github.com/brad/cmdbroker/actions/workflows/test.yml/badge.svg)](https://github.com/brad/cmdbroker/actions/workflows/test.yml)
+[![Lint Status](https://github.com/brad/cmdbroker/actions/workflows/lint.yml/badge.svg)](https://github.com/brad/cmdbroker/actions/workflows/lint.yml)
 [![codecov](https://codecov.io/gh/brad/cmdbroker/branch/main/graph/badge.svg)](https://codecov.io/gh/brad/cmdbroker)
 [![Join the chat at https://gitter.im/brad/cmdbroker](https://badges.gitter.im/brad/cmdbroker.svg)](https://gitter.im/brad/cmdbroker?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![License](https://img.shields.io/github/license/mashape/apistatus.svg)](https://pypi.python.org/pypi/cmdbroker/)
