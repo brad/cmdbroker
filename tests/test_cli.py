@@ -133,7 +133,7 @@ async def test_run_server_mode_without_address(mock_main, mock_argv):
 
 @pytest.mark.asyncio
 @patch("cmdbroker.cli.main")
-async def test_run_server_mode_with_missing_key_file(mock_main, mock_argv):
+async def test_run_server_mode_with_missing_key_file(mock_main, mock_argv, ssl_files):
     # Command-line arguments for server mode
     sys.argv = [
         "cmdbroker",
@@ -142,6 +142,8 @@ async def test_run_server_mode_with_missing_key_file(mock_main, mock_argv):
         "--server",
         "--address",
         "127.0.0.1",
+        "--broker-cert",
+        ssl_files[0],
         "--broker-key",
         "test-key.pem",
     ]
@@ -156,9 +158,59 @@ async def test_run_server_mode_with_missing_key_file(mock_main, mock_argv):
 
 @pytest.mark.asyncio
 @patch("cmdbroker.cli.main")
-async def test_run_client_mode_with_command(mock_main, mock_argv):
+async def test_run_server_mode(mock_main, mock_argv, ssl_files):
     # Command-line arguments for server mode
-    sys.argv = ["cmdbroker", '"ls -la"', "--config", "test-config.json", "--address", "127.0.0.1"]
+    sys.argv = [
+        "cmdbroker",
+        "--config",
+        "test-config.json",
+        "--server",
+        "--address",
+        "127.0.0.1",
+        "--broker-cert",
+        ssl_files[0],
+        "--broker-key",
+        ssl_files[1],
+    ]
+
+    # Call the run method
+    await cli.run()
+
+    # Assertions
+    mock_main.assert_awaited_once_with(
+        Namespace(
+            config="test-config.json",
+            command=None,
+            server=True,
+            address="127.0.0.1",
+            port=8889,
+            broker_cert=ssl_files[0],
+            broker_key=ssl_files[1],
+            cert_country=None,
+            cert_state=None,
+            cert_locality=None,
+            cert_org=None,
+            cert_days=365,
+            generate_cert_and_key=False,
+            password=None,
+        )
+    )
+
+
+@pytest.mark.asyncio
+@patch("cmdbroker.cli.main")
+async def test_run_client_mode_with_command(mock_main, mock_argv, ssl_files):
+    # Command-line arguments for client mode
+    sys.argv = [
+        "cmdbroker",
+        '"ls -la"',
+        "--config",
+        "test-config.json",
+        "--address",
+        "127.0.0.1",
+        "--broker-cert",
+        ssl_files[0],
+    ]
 
     # Call the run method
     await cli.run()
@@ -171,7 +223,7 @@ async def test_run_client_mode_with_command(mock_main, mock_argv):
             server=False,
             address="127.0.0.1",
             port=8889,
-            broker_cert="broker-cert.pem",
+            broker_cert=ssl_files[0],
             broker_key="broker-key.pem",
             cert_country=None,
             cert_state=None,

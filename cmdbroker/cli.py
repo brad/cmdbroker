@@ -116,8 +116,9 @@ async def run():
         if not os.path.exists(args.broker_cert):
             parser.error("Broker certificate file not found")
 
-    if not args.generate_cert_and_key and args.server and not os.path.exists(args.broker_key):
-        parser.error("Broker key file not found")
+    if not args.generate_cert_and_key and args.server:
+        if not os.path.exists(args.broker_key):
+            parser.error("Broker key file not found")
 
     await main(args)
 
