@@ -1,10 +1,12 @@
-import flet as ft
-import asyncio
-import socket
-import os
 import argparse
+import asyncio
+import os
+
+import flet as ft
+
 from ..client import Client
 from ..discovery import DiscoveryBrowser
+
 
 class ClientView(ft.Column):
     def __init__(self, flet_page, config):
@@ -28,8 +30,11 @@ class ClientView(ft.Column):
             ft.ListTile(
                 title=ft.Text(name),
                 subtitle=ft.Text(f"{info['address']}:{info['port']}"),
-                trailing=ft.IconButton(ft.icons.Icons.ADD, on_click=lambda e, i=info: self.add_remote(i)),
-            ) for name, info in self.discovered_services.items()
+                trailing=ft.IconButton(
+                    ft.icons.Icons.ADD, on_click=lambda e, i=info: self.add_remote(i)
+                ),
+            )
+            for name, info in self.discovered_services.items()
         ]
         self.flet_page.update()
 
@@ -39,27 +44,28 @@ class ClientView(ft.Column):
 
     async def request_cert_and_add(self, info):
         temp_params = argparse.Namespace(
-            address=info['address'],
-            port=info['port'],
-            command=None,
-            broker_cert="temp_cert.pem"
+            address=info["address"], port=info["port"], command=None, broker_cert="temp_cert.pem"
         )
         client = Client(temp_params)
         try:
             cert_data = await client.request_certificate()
             # Show dialog to save cert
-            cert_path = os.path.join(os.path.expanduser("~"), ".config", "cmdbroker", f"{info['name']}.pem")
+            cert_path = os.path.join(
+                os.path.expanduser("~"), ".config", "cmdbroker", f"{info['name']}.pem"
+            )
             os.makedirs(os.path.dirname(cert_path), exist_ok=True)
             with open(cert_path, "wb") as f:
                 f.write(cert_data)
 
-            self.config.remotes.append({
-                "name": info['name'],
-                "address": info['address'],
-                "port": info['port'],
-                "cert": cert_path,
-                "commands": []
-            })
+            self.config.remotes.append(
+                {
+                    "name": info["name"],
+                    "address": info["address"],
+                    "port": info["port"],
+                    "cert": cert_path,
+                    "commands": [],
+                }
+            )
             self.config.save()
             self.update_remotes_list()
         except Exception as e:
@@ -90,8 +96,18 @@ class ClientView(ft.Column):
                     ft.VerticalDivider(),
                     ft.Column(
                         [
-                            ft.Row([self.command_input, ft.ElevatedButton("Run", on_click=self.run_command)]),
-                            ft.Row([ft.Text("Quick Commands", size=16, weight=ft.FontWeight.BOLD), ft.IconButton(ft.icons.Icons.SAVE, on_click=self.save_command)]),
+                            ft.Row(
+                                [
+                                    self.command_input,
+                                    ft.ElevatedButton("Run", on_click=self.run_command),
+                                ]
+                            ),
+                            ft.Row(
+                                [
+                                    ft.Text("Quick Commands", size=16, weight=ft.FontWeight.BOLD),
+                                    ft.IconButton(ft.icons.Icons.SAVE, on_click=self.save_command),
+                                ]
+                            ),
                             self.saved_commands,
                             self.output_text,
                         ],
@@ -105,10 +121,8 @@ class ClientView(ft.Column):
 
     def update_remotes_list(self):
         self.remotes_list.controls = [
-            ft.ListTile(
-                title=ft.Text(r["name"]),
-                on_click=lambda e, r=r: self.select_remote(r)
-            ) for r in self.config.remotes
+            ft.ListTile(title=ft.Text(r["name"]), on_click=lambda e, r=r: self.select_remote(r))
+            for r in self.config.remotes
         ]
         if hasattr(self, "flet_page"):
             self.flet_page.update()
@@ -126,10 +140,16 @@ class ClientView(ft.Column):
 
         commands = self.selected_remote.get("commands", [])
         self.saved_commands.controls = [
-            ft.Row([
-                ft.TextButton(cmd, on_click=lambda e, c=cmd: self.run_saved_command(c)),
-                ft.IconButton(ft.icons.Icons.DELETE, on_click=lambda e, c=cmd: self.delete_saved_command(c))
-            ]) for cmd in commands
+            ft.Row(
+                [
+                    ft.TextButton(cmd, on_click=lambda e, c=cmd: self.run_saved_command(c)),
+                    ft.IconButton(
+                        ft.icons.Icons.DELETE,
+                        on_click=lambda e, c=cmd: self.delete_saved_command(c),
+                    ),
+                ]
+            )
+            for cmd in commands
         ]
         self.flet_page.update()
 
@@ -164,17 +184,18 @@ class ClientView(ft.Column):
             address=self.selected_remote["address"],
             port=self.selected_remote["port"],
             command=self.command_input.value,
-            broker_cert=self.selected_remote["cert"]
+            broker_cert=self.selected_remote["cert"],
         )
         client = Client(params)
         try:
             # We need a way to capture output from Client.run()
             # For now, let's mock the relay_to_server call or modify Client
             from ..message import Message
+
             payload = {"method": "process", "parameters": {"command": params.command}}
             response = await client.relay_to_server(Message.build(payload))
             self.output_text.value += f"\n> {params.command}\n{response.text.decode('utf-8')}"
             self.flet_page.update()
-        except Exception as e:
-            self.output_text.value += f"\nError: {e}"
+        except Exception as err:
+            self.output_text.value += f"\nError: {err}"
             self.flet_page.update()

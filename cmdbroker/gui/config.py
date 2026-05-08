@@ -1,11 +1,13 @@
 import json
 import os
-import keyring
 from pathlib import Path
+
+import keyring
 
 CONFIG_DIR = Path.home() / ".config" / "cmdbroker"
 CONFIG_FILE = CONFIG_DIR / "gui_config.json"
 SERVICE_NAME = "cmdbroker"
+
 
 class Config:
     def __init__(self):
@@ -28,10 +30,7 @@ class Config:
         # Ensure directory is secure
         os.chmod(CONFIG_DIR, 0o700)
 
-        data = {
-            "remotes": self.remotes,
-            "listeners": self.listeners
-        }
+        data = {"remotes": self.remotes, "listeners": self.listeners}
         with open(CONFIG_FILE, "w") as f:
             json.dump(data, f, indent=4)
 

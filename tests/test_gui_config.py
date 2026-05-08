@@ -1,8 +1,9 @@
 import os
 import unittest
-from pathlib import Path
-from unittest.mock import MagicMock, patch
-from cmdbroker.gui.config import Config, CONFIG_FILE, CONFIG_DIR
+from unittest.mock import patch
+
+from cmdbroker.gui.config import CONFIG_DIR, CONFIG_FILE, Config
+
 
 class TestConfig(unittest.TestCase):
     def setUp(self):
@@ -18,12 +19,12 @@ class TestConfig(unittest.TestCase):
         self.assertEqual(new_config.remotes, [{"name": "test", "address": "1.2.3.4"}])
 
         # Check permissions
-        self.assertEqual(oct(os.stat(CONFIG_DIR).st_mode & 0o777), '0o700')
-        self.assertEqual(oct(os.stat(CONFIG_FILE).st_mode & 0o777), '0o600')
+        self.assertEqual(oct(os.stat(CONFIG_DIR).st_mode & 0o777), "0o700")
+        self.assertEqual(oct(os.stat(CONFIG_FILE).st_mode & 0o777), "0o600")
 
-    @patch('keyring.set_password')
-    @patch('keyring.get_password')
-    @patch('keyring.delete_password')
+    @patch("keyring.set_password")
+    @patch("keyring.get_password")
+    @patch("keyring.delete_password")
     def test_keyring(self, mock_delete, mock_get, mock_set):
         mock_get.return_value = "secret"
 
@@ -37,5 +38,6 @@ class TestConfig(unittest.TestCase):
         self.config.delete_password("mykey")
         mock_delete.assert_called_with("cmdbroker", "mykey")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

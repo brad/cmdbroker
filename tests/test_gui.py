@@ -1,10 +1,13 @@
-import unittest
 import asyncio
-from unittest.mock import MagicMock, patch, AsyncMock
+import unittest
+from unittest.mock import AsyncMock, MagicMock, patch
+
 import flet as ft
+
 from cmdbroker.gui.client_view import ClientView
-from cmdbroker.gui.server_view import ServerView
 from cmdbroker.gui.config import Config
+from cmdbroker.gui.server_view import ServerView
+
 
 class TestGUIComponents(unittest.TestCase):
     def setUp(self):
@@ -20,14 +23,14 @@ class TestGUIComponents(unittest.TestCase):
         view = ServerView(self.page, self.config)
         self.assertIsInstance(view, ft.Column)
 
-    @patch('cmdbroker.gui.client_view.DiscoveryBrowser')
+    @patch("cmdbroker.gui.client_view.DiscoveryBrowser")
     def test_client_discovery_update(self, mock_browser):
         view = ClientView(self.page, self.config)
         view.on_discovery_update({"test": {"address": "1.2.3.4", "port": 8889, "name": "test"}})
         self.assertIn("test", view.discovered_services)
         self.assertEqual(len(view.discovered_list.controls), 1)
 
-    @patch('cmdbroker.gui.client_view.Client')
+    @patch("cmdbroker.gui.client_view.Client")
     def test_add_remote(self, mock_client_cls):
         mock_client = mock_client_cls.return_value
         mock_client.request_certificate = AsyncMock(return_value=b"cert-data")
@@ -37,14 +40,15 @@ class TestGUIComponents(unittest.TestCase):
 
         # We need to run the async task
         import asyncio
+
         loop = asyncio.get_event_loop()
         loop.run_until_complete(view.request_cert_and_add(info))
 
         self.config.save.assert_called()
         self.page.update.assert_called()
 
-    @patch('cmdbroker.gui.server_view.Server')
-    @patch('cmdbroker.gui.server_view.Discovery')
+    @patch("cmdbroker.gui.server_view.Server")
+    @patch("cmdbroker.gui.server_view.Discovery")
     def test_start_server(self, mock_discovery_cls, mock_server_cls):
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
@@ -57,7 +61,9 @@ class TestGUIComponents(unittest.TestCase):
         view = ServerView(self.page, self.config)
 
         # Start the server logic in a task
-        task = loop.create_task(view.run_server_logic("test", 8889, "cert.pem", "key.pem", "password"))
+        task = loop.create_task(
+            view.run_server_logic("test", 8889, "cert.pem", "key.pem", "password")
+        )
 
         # Run the loop until the server is registered
         async def check_registered():
@@ -84,7 +90,7 @@ class TestGUIComponents(unittest.TestCase):
         self.assertEqual(view.selected_remote, remote)
         self.page.update.assert_called()
 
-    @patch('cmdbroker.gui.client_view.Client')
+    @patch("cmdbroker.gui.client_view.Client")
     def test_run_command(self, mock_client_cls):
         mock_client = mock_client_cls.return_value
         mock_response = MagicMock()
@@ -92,7 +98,12 @@ class TestGUIComponents(unittest.TestCase):
         mock_client.relay_to_server = AsyncMock(return_value=mock_response)
 
         view = ClientView(self.page, self.config)
-        view.selected_remote = {"name": "test", "address": "1.2.3.4", "port": 8889, "cert": "cert.pem"}
+        view.selected_remote = {
+            "name": "test",
+            "address": "1.2.3.4",
+            "port": 8889,
+            "cert": "cert.pem",
+        }
         view.command_input.value = "ls"
 
         loop = asyncio.new_event_loop()
@@ -102,5 +113,6 @@ class TestGUIComponents(unittest.TestCase):
         self.assertIn("output", view.output_text.value)
         self.page.update.assert_called()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

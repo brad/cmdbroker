@@ -1,10 +1,13 @@
-import flet as ft
+import argparse
 import asyncio
 import os
-import argparse
 import socket
-from ..server import Server
+
+import flet as ft
+
 from ..discovery import Discovery
+from ..server import Server
+
 
 class ServerView(ft.Column):
     def __init__(self, flet_page, config):
@@ -24,7 +27,13 @@ class ServerView(ft.Column):
                 content=ft.Column(
                     [
                         ft.Text("Manage Servers", size=20, weight=ft.FontWeight.BOLD),
-                        ft.Row([self.server_name, self.server_port, ft.ElevatedButton("Start Server", on_click=self.start_server)]),
+                        ft.Row(
+                            [
+                                self.server_name,
+                                self.server_port,
+                                ft.ElevatedButton("Start Server", on_click=self.start_server),
+                            ]
+                        ),
                         ft.Divider(),
                         self.server_list,
                     ],
@@ -40,12 +49,13 @@ class ServerView(ft.Column):
         self.server_list.controls = [
             ft.ListTile(
                 title=ft.Text(f"{name} (Port: {info['port']})"),
-                subtitle=ft.Text("Running" if info['running'] else "Stopped"),
+                subtitle=ft.Text("Running" if info["running"] else "Stopped"),
                 trailing=ft.IconButton(
-                    ft.icons.Icons.STOP if info['running'] else ft.icons.Icons.PLAY_ARROW,
-                    on_click=lambda e, n=name: self.toggle_server(n)
-                )
-            ) for name, info in self.running_servers.items()
+                    ft.icons.Icons.STOP if info["running"] else ft.icons.Icons.PLAY_ARROW,
+                    on_click=lambda e, n=name: self.toggle_server(n),
+                ),
+            )
+            for name, info in self.running_servers.items()
         ]
         if hasattr(self, "flet_page"):
             self.flet_page.update()
@@ -54,7 +64,9 @@ class ServerView(ft.Column):
         name = self.server_name.value
         port = int(self.server_port.value)
 
-        cert_path = os.path.join(os.path.expanduser("~"), ".config", "cmdbroker", f"{name}_cert.pem")
+        cert_path = os.path.join(
+            os.path.expanduser("~"), ".config", "cmdbroker", f"{name}_cert.pem"
+        )
         key_path = os.path.join(os.path.expanduser("~"), ".config", "cmdbroker", f"{name}_key.pem")
         os.makedirs(os.path.dirname(cert_path), exist_ok=True)
 
@@ -91,7 +103,7 @@ class ServerView(ft.Column):
             cert_state="CA",
             cert_locality="SF",
             cert_org="cmdbroker",
-            cert_days=365
+            cert_days=365,
         )
 
         server = Server(params)
@@ -99,6 +111,7 @@ class ServerView(ft.Column):
         # Override approve_cert_request
         async def approve(client_name):
             result = asyncio.Future()
+
             def on_click(approved):
                 self.flet_page.dialog.open = False
                 self.flet_page.update()
@@ -125,7 +138,7 @@ class ServerView(ft.Column):
             "port": port,
             "running": True,
             "server": server,
-            "discovery": discovery
+            "discovery": discovery,
         }
         self.update_server_list()
 
@@ -142,10 +155,10 @@ class ServerView(ft.Column):
 
     def toggle_server(self, name):
         info = self.running_servers[name]
-        if info['running']:
-            info['server'].stop()
-            info['discovery'].unregister()
-            info['running'] = False
+        if info["running"]:
+            info["server"].stop()
+            info["discovery"].unregister()
+            info["running"] = False
         else:
             # Re-start logic would go here
             pass

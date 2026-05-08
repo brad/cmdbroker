@@ -1,5 +1,7 @@
 import socket
-from zeroconf import IPVersion, ServiceInfo, Zeroconf, ServiceBrowser
+
+from zeroconf import IPVersion, ServiceBrowser, ServiceInfo, Zeroconf
+
 
 class Discovery:
     def __init__(self, port=None):
@@ -29,6 +31,7 @@ class Discovery:
             self.zeroconf.unregister_service(self.info)
         self.zeroconf.close()
 
+
 class DiscoveryBrowser:
     def __init__(self, on_update):
         self.zeroconf = Zeroconf(ip_version=IPVersion.V4Only)
@@ -49,7 +52,7 @@ class DiscoveryBrowser:
                 "name": name,
                 "address": address,
                 "port": info.port,
-                "properties": info.properties
+                "properties": info.properties,
             }
             self.on_update(self.services)
 

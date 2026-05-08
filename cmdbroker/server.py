@@ -112,12 +112,16 @@ class Server:
             # It should be approved by the user.
             approved = False
             if hasattr(self, "approve_cert_request"):
-                approved = await self.approve_cert_request(request_json.get("client_name", "Unknown"))
+                approved = await self.approve_cert_request(
+                    request_json.get("client_name", "Unknown")
+                )
             else:
                 # CLI mode - prompt on console
                 print(f"\nCertificate request from {request_json.get('client_name', 'Unknown')}")
-                response = await asyncio.to_thread(input, "Allow download of public certificate? [y/N]: ")
-                if response.lower() == 'y':
+                response = await asyncio.to_thread(
+                    input, "Allow download of public certificate? [y/N]: "
+                )
+                if response.lower() == "y":
                     approved = True
 
             if not approved:

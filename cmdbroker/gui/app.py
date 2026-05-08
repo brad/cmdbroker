@@ -1,8 +1,9 @@
-import asyncio
 import flet as ft
+
 from .client_view import ClientView
-from .server_view import ServerView
 from .config import Config
+from .server_view import ServerView
+
 
 async def main(page: ft.Page):
     page.title = "cmdbroker"
@@ -17,8 +18,8 @@ async def main(page: ft.Page):
 
     def on_nav_change(e):
         index = e.control.selected_index
-        client_view.visible = (index == 0)
-        server_view.visible = (index == 1)
+        client_view.visible = index == 0
+        server_view.visible = index == 1
         page.update()
 
     page.navigation_bar = ft.NavigationBar(
@@ -43,6 +44,7 @@ async def main(page: ft.Page):
     client_view.visible = True
     server_view.visible = False
     page.update()
+
 
 def run_gui():
     ft.app(target=main)

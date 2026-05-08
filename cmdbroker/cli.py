@@ -11,6 +11,7 @@ from .server import Server
 async def main(args: argparse.Namespace):
     if args.gui:
         from .gui.app import run_gui
+
         run_gui()
     elif args.server:
         await Server(args).run()
