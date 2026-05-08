@@ -1,6 +1,7 @@
 import argparse
 import asyncio
 import select
+import socket
 import ssl
 import sys
 
@@ -50,3 +51,19 @@ class Client:
         await writer.wait_closed()
 
         return response
+
+    async def request_certificate(self):
+        """Request the certificate from the server without SSL."""
+        # This is insecure as it's plain text, but it's used to bootstrap the SSL connection
+        # and relies on server-side approval.
+        reader, writer = await asyncio.open_connection(self.address, self.port)
+
+        request = Message.build({"method": "get_cert", "client_name": socket.gethostname()})
+        await request.async_write(writer)
+
+        cert_data = await reader.read()
+
+        writer.close()
+        await writer.wait_closed()
+
+        return cert_data

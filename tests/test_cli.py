@@ -20,6 +20,7 @@ async def test_main_initializes_server_when_server_arg_provided(
 ):
     args = Namespace(
         server=True,
+        gui=False,
         address="localhost",
         port=8889,
         command=None,
@@ -49,6 +50,7 @@ async def test_main_initializes_server_when_server_arg_provided(
 async def test_main_initializes_client_when_server_arg_not_provided(mock_client, mock_server):
     args = Namespace(
         server=False,
+        gui=False,
         address="localhost",
         port=8889,
         command="test_command",
@@ -101,6 +103,7 @@ async def test_run_server_mode_with_config(mock_main, mock_exists, mock_argv):
         Namespace(
             config="test-config.json",
             server=True,
+            gui=False,
             address="127.0.0.1",
             port=8889,
             command=None,
@@ -182,6 +185,7 @@ async def test_run_server_mode(mock_main, mock_argv, ssl_files):
             config="test-config.json",
             command=None,
             server=True,
+            gui=False,
             address="127.0.0.1",
             port=8889,
             broker_cert=ssl_files[0],
@@ -221,6 +225,7 @@ async def test_run_client_mode_with_command(mock_main, mock_argv, ssl_files):
             config="test-config.json",
             command='"ls -la"',
             server=False,
+            gui=False,
             address="127.0.0.1",
             port=8889,
             broker_cert=ssl_files[0],

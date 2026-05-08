@@ -97,11 +97,39 @@ class Server:
 
     async def handle_request(self, reader, writer):
         # Process incoming data
-        request = await Message.async_read(reader)
+        try:
+            request = await Message.async_read(reader)
+        except Exception:
+            writer.close()
+            await writer.wait_closed()
+            return
 
         request_json = request.json()
-        method = request_json["method"]
-        if method == "process":
+        method = request_json.get("method")
+
+        if method == "get_cert":
+            # This is a special method for clients to request the public certificate
+            # It should be approved by the user.
+            approved = False
+            if hasattr(self, "approve_cert_request"):
+                approved = await self.approve_cert_request(request_json.get("client_name", "Unknown"))
+            else:
+                # CLI mode - prompt on console
+                print(f"\nCertificate request from {request_json.get('client_name', 'Unknown')}")
+                response = await asyncio.to_thread(input, "Allow download of public certificate? [y/N]: ")
+                if response.lower() == 'y':
+                    approved = True
+
+            if not approved:
+                writer.close()
+                await writer.wait_closed()
+                return
+
+            with open(self.broker_cert, "rb") as f:
+                cert_data = f.read()
+            writer.write(cert_data)
+            await writer.drain()
+        elif method == "process":
             parameters = request_json["parameters"]
             cmd = parameters["command"]
 

@@ -9,7 +9,10 @@ from .server import Server
 
 # Main function to start server and client
 async def main(args: argparse.Namespace):
-    if args.server:
+    if args.gui:
+        from .gui.app import run_gui
+        run_gui()
+    elif args.server:
         await Server(args).run()
     else:
         await Client(args).run()
@@ -41,6 +44,12 @@ async def run():
         action="store_true",
         help="Run in server mode",
         default=config.get("server", False),
+    )
+    parser.add_argument(
+        "--gui",
+        action="store_true",
+        help="Run in GUI mode",
+        default=config.get("gui", False),
     )
     parser.add_argument(
         "--generate-cert-and-key",
@@ -109,7 +118,7 @@ async def run():
 
     args = parser.parse_args()
 
-    if not args.server and not args.command:
+    if not args.server and not args.command and not args.gui:
         parser.error("You must provide a command when running in client mode")
 
     if not args.generate_cert_and_key or not args.server:

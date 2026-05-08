@@ -9,6 +9,9 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = ">=3.10"
 cryptography = "^42.0.8"
+flet = "^0.84.0"
+keyring = "^25.7.0"
+zeroconf = "^0.148.0"
 
 [tool.poetry.dev-dependencies]
 vulture = ">=2.6"
